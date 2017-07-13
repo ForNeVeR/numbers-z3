@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.Z3;
 
@@ -9,6 +10,8 @@ namespace ConsoleApp4
     {
         static void Main()
         {
+            var timer = new Stopwatch();
+            timer.Start();
             var verbose = true;
             using (var context = new Context())
             {
@@ -75,12 +78,6 @@ namespace ConsoleApp4
 
                 solver.Assert(context.MkEq(equation, context.MkInt(result)));
 
-                if (verbose)
-                {
-                    Console.WriteLine("Hit key when ready");
-                    Console.ReadKey();
-                }
-
                 var step = 1;
                 while (solver.Check() == Status.SATISFIABLE)
                 {
@@ -130,6 +127,9 @@ namespace ConsoleApp4
                     ++step;
                 }
             }
+
+            timer.Stop();
+            Console.WriteLine($"Solution took {timer.Elapsed}");
         }
     }
 }
