@@ -15,8 +15,7 @@ namespace ConsoleApp4
                 const int numberCount = 6;
                 const int result = 35;
 
-
-                var operatorType = context.MkEnumSort("operator", "Plus", "Minus", "Mult", "Div");
+                var operatorType = context.MkEnumSort("operator", "Plus", "Minus", "Mult", "Concat");
                 var plus = operatorType.Consts[0];
                 var minus = operatorType.Consts[1];
                 var mult = operatorType.Consts[2];
@@ -28,11 +27,12 @@ namespace ConsoleApp4
                     .Select(i => context.MkConst($"op{i}", operatorType))
                     .ToList();
 
+                var ten = context.MkInt(10);
                 IntExpr applyOperator(IntExpr x, Expr @operator, IntExpr y) =>
                     (IntExpr)context.MkITE(context.MkEq(@operator, plus), context.MkAdd(x, y),
                         context.MkITE(context.MkEq(@operator, minus), context.MkSub(x, y),
                             context.MkITE(context.MkEq(@operator, mult), context.MkMul(x, y),
-                                context.MkDiv(x, y))));
+                                context.MkAdd(context.MkMul(x, ten), y))));
 
                 var solver = context.MkSolver();
 
