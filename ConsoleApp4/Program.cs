@@ -5,7 +5,7 @@ using Microsoft.Z3;
 
 namespace ConsoleApp4
 {
-    static class Program2
+    static class Program
     {
         static void Main(string[] args)
         {
@@ -25,14 +25,32 @@ namespace ConsoleApp4
                 var solver = context.MkSolver();
 
                 var b1 = context.MkConst("b1", @operator);
+                var b2 = context.MkConst("b2", @operator);
+                var b3 = context.MkConst("b3", @operator);
+                var b4 = context.MkConst("b4", @operator);
+                var b5 = context.MkConst("b5", @operator);
 
-                // Assert that 2 <operator> 2 = 4:
                 solver.Assert(
                     context.MkEq(
-                        myf(context.MkInt(2), b1, context.MkInt(2)),
-                        context.MkInt(4)));
+                        myf(
+                            myf(
+                                myf(
+                                    myf(
+                                        myf(
+                                            context.MkInt(1),
+                                            b1,
+                                            context.MkInt(2)),
+                                        b2,
+                                        context.MkInt(3)),
+                                    b3,
+                                    context.MkInt(4)),
+                                b4,
+                                context.MkInt(5)),
+                            b5,
+                            context.MkInt(6)),
+                        context.MkInt(35)));
 
-                var operators = new[] { b1 };
+                var operators = new[] { b1, b2, b3, b4, b5 };
                 var solutions = new List<Expr[]>();
                 var step = 1;
                 while (solver.Check() == Status.SATISFIABLE)
