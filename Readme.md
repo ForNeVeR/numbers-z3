@@ -6,8 +6,8 @@ This program tries to solve [the Numbers problem][numbers] using [Z3][z3].
 The original Numbers problem is classified as "problem-9" (because it has 9
 numbers involved).
 
-Currently solved task: "constrained problem-6" (where "constrained" means that
-no number reordering is allowed).
+Currently solved task: "constrained problem-9" (where "constrained" means that
+no concat operation is allowed).
 
 **Status**: research in progress.
 
