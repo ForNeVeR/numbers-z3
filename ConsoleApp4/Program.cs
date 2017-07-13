@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Z3;
 
@@ -6,7 +7,7 @@ namespace ConsoleApp4
 {
     static class Program2
     {
-        static void Main2(string[] args)
+        static void Main(string[] args)
         {
             using (var context = new Context())
             {
@@ -27,43 +28,37 @@ namespace ConsoleApp4
 
                 // Assert that 2 <operator> 2 = 4:
                 solver.Assert(
-                    context.MkExists(
-                        new[] { b1 },
-                        context.MkEq(
-                            myf(context.MkInt(2), b1, context.MkInt(2)),
-                            context.MkInt(4))));
+                    context.MkEq(
+                        myf(context.MkInt(2), b1, context.MkInt(2)),
+                        context.MkInt(4)));
 
+                var operators = new[] { b1 };
+                var solutions = new List<Expr[]>();
+                var step = 1;
                 while (solver.Check() == Status.SATISFIABLE)
                 {
+                    Console.WriteLine($"## Step {step}");
+
                     var model = solver.Model;
-                    var decls = model.ConstDecls.Select(model.ConstInterp).First(); // srsly, wtf
-                    //model.ConstDecls[0].
+                    Console.WriteLine($"Current model: {model}");
 
-                    //Console.WriteLine(model);
-                    Console.WriteLine(decls);
+                    var values = operators.Select(o => (o, model.Eval(o, true))).ToList();
+                    solutions.Add(values.Select(v => v.Item2).ToArray());
 
-                    //solver.Add(context.MkNot(context.MkEq(decls., decls))); // forbid to show the same answer again
+                    Console.WriteLine("Current operator values:");
+                    values.ForEach(val => Console.WriteLine($"{val.Item1}: {val.Item2}"));
+
+                    solver.Add(context.MkOr(
+                        values.Select(val => context.MkNot(context.MkEq(val.Item1, val.Item2)))));
+
+                    ++step;
                 }
-                /* Output:
-(define-fun b1!0 () operator
-  Plus)
-Plus
-(define-fun b1!1 () operator
-  Plus)
-(define-fun b1 () operator
-  Minus)
-Minus
-(define-fun b1!1 () operator
-  Mult)
-(define-fun b1 () operator
-  Mult)
-Mult
-(define-fun b1!1 () operator
-  Mult)
-(define-fun b1 () operator
-  Div)
-Div
-                 */
+
+                Console.WriteLine("# Solutions");
+                foreach (var solution in solutions)
+                {
+                    Console.WriteLine(string.Join(" ", solution.AsEnumerable()));
+                }
             }
         }
     }
